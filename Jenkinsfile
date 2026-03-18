@@ -1,5 +1,13 @@
 pipeline {
-    agent any // Pode ser substituído por um container Docker com o SDK do .NET, se a infra permitir
+    // Aqui está a mágica do isolamento: o Jenkins vai baixar essa imagem do .NET, 
+    // subir um container descartável, rodar a esteira lá dentro e depois matá-lo.
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:8.0'
+            // O parâmetro abaixo garante que não teremos erro de permissão na pasta de trabalho
+            args '-u root' 
+        }
+    }
 
     stages {
         stage('Checkout') {
