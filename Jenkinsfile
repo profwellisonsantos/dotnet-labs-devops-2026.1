@@ -1,56 +1,61 @@
 pipeline {
-    // Aqui está a mágica do isolamento: o Jenkins vai baixar essa imagem do .NET, 
-    // subir um container descartável, rodar a esteira lá dentro e depois matá-lo.
     agent {
         docker {
             image 'mcr.microsoft.com/dotnet/sdk:8.0'
-            // O parâmetro abaixo garante que não teremos erro de permissão na pasta de trabalho
             args '-u root' 
         }
     }
 
+    // Variáveis de ambiente para facilitar a vida do aluno
+    environment {
+        // O aluno deve colocar o IP da máquina dele da AWS aqui
+        AWS_IP = '3.80.127.174' 
+    }
+
     stages {
         stage('Checkout') {
-            steps {
-                echo 'Baixando o código do repositório...'
-                checkout scm
-            }
+            steps { checkout scm }
         }
 
         stage('Restore') {
-            steps {
-                echo 'Restaurando pacotes e dependências do NuGet...'
-                sh 'dotnet restore'
-            }
+            steps { sh 'dotnet restore' }
         }
 
         stage('Build') {
-            steps {
-                echo 'Compilando a aplicação .NET...'
-                // O --no-restore otimiza o tempo, pois já fizemos no passo anterior
-                sh 'dotnet build --configuration Release --no-restore'
-            }
+            steps { sh 'dotnet build --configuration Release --no-restore' }
         }
 
         stage('Test') {
+            steps { sh 'dotnet test --configuration Release --no-build --verbosity normal' }
+        }
+
+        stage('Publish') {
             steps {
-                echo 'Executando a suíte de testes unitários...'
-                // O --no-build garante que estamos testando exatamente o que foi compilado na etapa anterior
-                sh 'dotnet test --configuration Release --no-build --verbosity normal'
+                echo 'Empacotando a API para deploy...'
+                sh 'dotnet publish ExemploDevOps.Api/ExemploDevOps.Api.csproj -c Release -o ./publish-output'
             }
         }
-    }
-    
-    post {
-        always {
-            echo 'Esteira finalizada. Limpando o workspace...'
-            cleanWs()
-        }
-        success {
-            echo '✅ Pipeline executado com sucesso! A aplicação está íntegra.'
-        }
-        failure {
-            echo '❌ Falha no pipeline. Verifique os logs do Build ou dos Testes.'
+
+        stage('Deploy to AWS') {
+            steps {
+                echo 'Iniciando o deploy direto para a AWS...'
+                
+                // 1. Prepara o container instalando o cliente SSH e desabilitando a checagem de host (mesmo truque do Ansible)
+                sh 'apt-get update && apt-get install -y openssh-client'
+                sh 'mkdir -p ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config'
+
+                // 2. Abre o cofre do Jenkins e injeta a chave de forma segura
+                withCredentials([sshUserPrivateKey(credentialsId: 'aws-lab-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                    
+                    // 3. Copia a pasta compilada para o servidor da AWS
+                    echo 'Transferindo arquivos via SCP...'
+                    sh 'scp -i $SSH_KEY -r ./publish-output/* ${SSH_USER}@${AWS_IP}:/var/www/ExemploDevOps/'
+
+                    // 4. Reinicia o serviço no Linux para aplicar a nova versão
+                    echo 'Reiniciando o serviço da API...'
+                    sh 'ssh -i $SSH_KEY ${SSH_USER}@${AWS_IP} "sudo systemctl restart webapi"'
+                }
+            }
         }
     }
 }
