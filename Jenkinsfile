@@ -9,7 +9,7 @@ pipeline {
     // Variáveis de ambiente para facilitar a vida do aluno
     environment {
         // O aluno deve colocar o IP da máquina dele da AWS aqui
-        AWS_IP = '3.80.127.174' 
+        AWS_IP = '3.95.67.121' 
     }
 
     stages {
@@ -45,7 +45,7 @@ pipeline {
                 sh 'mkdir -p ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config'
 
                 // 2. Abre o cofre do Jenkins e injeta a chave de forma segura
-                withCredentials([sshUserPrivateKey(credentialsId: 'aws-lab-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'Terraform', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     
                     // 3. Copia a pasta compilada para o servidor da AWS
                     echo 'Transferindo arquivos via SCP...'
