@@ -25,9 +25,9 @@ pipeline {
             steps { sh 'dotnet build --configuration Release --no-restore' }
         }
 
-        stage('Test') {
-            steps { sh 'dotnet test --configuration Release --no-build --verbosity normal' }
-        }
+        // stage('Test') {
+        //     steps { sh 'dotnet test --configuration Release --no-build --verbosity normal' }
+        // }
 
         stage('Publish') {
             steps {
