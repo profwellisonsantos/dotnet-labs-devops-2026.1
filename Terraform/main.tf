@@ -29,6 +29,13 @@ resource "aws_security_group" "dotnet_api_sg" {
     cidr_blocks = ["0.0.0.0/0"] # Em um cenário real, restringiríamos ao IP da faculdade
   }
 
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Em um cenário real, restringiríamos ao IP da faculdade
+  }
+
   # Regra de Saída: Permite que o servidor baixe pacotes da internet (ex: SDK do .NET)
   egress {
     from_port   = 0
