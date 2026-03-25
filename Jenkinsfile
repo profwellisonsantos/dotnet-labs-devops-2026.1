@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME    = "calculadora"
+        APP_NAME    = "weatherforecast"
         IMAGE_NAME  = "wellisonraul/${env.APP_NAME}"
         BRANCH_NAME = GIT_BRANCH.replaceFirst(/^origin\//, '')
     }
