@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         APP_NAME    = "weatherforecast"
-        // Extrai o nome da branch atual (ex: main, develop, feature-xyz)
-        BRANCH_NAME = "${env.GIT_BRANCH.split('/').last()}"
+        BRANCH_NAME = "${env.GIT_BRANCH ? env.GIT_BRANCH.split('/').last() : 'null'}"
         IMAGE_NAME  = "wellisonraul/${env.APP_NAME}"
     }
 
