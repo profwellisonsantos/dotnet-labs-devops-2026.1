@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME    = "weatherforecast"
-        BRANCH_NAME = "${env.GIT_BRANCH ? env.GIT_BRANCH.split('/').last() : 'null'}"
+        BRANCH_NAME = "${env.BRANCH_NAME}"
         IMAGE_NAME  = "wellisonraul/${env.APP_NAME}"
     }
 
