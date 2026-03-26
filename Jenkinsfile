@@ -1,64 +1,56 @@
 pipeline {
-    agent any
+    agent none 
 
     environment {
         APP_NAME    = "weatherforecast"
+        // Extrai o nome da branch atual (ex: main, develop, feature-xyz)
+        BRANCH_NAME = "${env.GIT_BRANCH.split('/').last()}"
         IMAGE_NAME  = "wellisonraul/${env.APP_NAME}"
-        BRANCH_NAME = GIT_BRANCH.replaceFirst(/^origin\//, '')
     }
 
     stages {
-        stage('Build, testando e empacotando') {
+        stage('Build e Push') {
+            agent { label 'built-in' } 
             steps {
                 script {
-                    echo "Compilando, testando e empacotando a aplicação..."
-                    //sh 'docker build -t $APP_NAME:$BRANCH_NAME-$BUILD_NUMBER . --no-cache'  // Exemplo de comando para compilar uma aplicação Dotnet
-                    app = docker.build("${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}", '.')
-                }
-            }
-        }
-
-        stage('Docker image push') {
-            steps {
-                script {
-                    /* Push image using withRegistry. */
+                    echo "🛠️ Compilando a branch: ${env.BRANCH_NAME}"
+                    
+                    // Taggeamos a imagem com o nome da branch + ID do build
+                    // Ex: wellisonraul/weatherforecast:develop-12
+                    def fullImageName = "${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}"
+                    
+                    app = docker.build(fullImageName, '.')
+                    
                     docker.withRegistry('https://registry.hub.docker.com/', 'dockerhub') {
-                        app.push("${env.BUILD_ID}")
-                        app.push('latest')
+                        app.push()
+                        // Também atualizamos a 'latest' daquela branch específica
+                        app.push("${env.BRANCH_NAME}-latest")
                     }
                 }
-            
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy por Branch') {
+            agent { label 'aws-server' } 
             steps {
                 script {
-                    echo "🚀 Realizando o deploy..."
-
-                    // Força parar o container antigo se ele existir
-                    try {
-                        sh "docker rm -f ${env.APP_NAME}-${env.BRANCH_NAME} || true"
-                    } catch (Exception e) {
-                        echo "Nenhum container antigo rodando. Vamos seguir com o deploy novo!"
-                    }
-
-                    // Roda o novo container
-                    //docker.image("${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}").run("--name ${env.APP_NAME}-${env.BRANCH_NAME}")
-
-
-                    echo "✅ Deploy finalizado com sucesso!"
+                    echo "🚀 Fazendo deploy da branch ${env.BRANCH_NAME} na AWS..."
+                    
+                    // Criamos um nome de container único por branch para elas não colidirem
+                    // Ex: container rodando em portas diferentes ou nomes diferentes
+                    def containerName = "${env.APP_NAME}-${env.BRANCH_NAME}"
+                    
+                    sh """
+                        docker rm -f ${containerName} || true
+                        docker pull ${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}
+                        
+                        # Exemplo: Se for a main, roda na 5000. Se for develop, na 5001.
+                        def port = (env.BRANCH_NAME == 'main') ? '5000' : '5001'
+                        
+                        docker run -d --name ${containerName} -p ${port}:8080 ${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}
+                    """
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Pipeline concluído com sucesso!"
-        }
-        failure {
-            echo "Pipeline falhou!"
         }
     }
 }

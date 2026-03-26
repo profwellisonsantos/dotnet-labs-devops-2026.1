@@ -1,14 +1,18 @@
-# Etapa 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
-# Define o diretório de trabalho
 WORKDIR /src
 
-# Copia o arquivo de projeto e restaura as dependências
 COPY . .
-
+RUN dotnet restore
 RUN dotnet build
-
 RUN dotnet test
 
-ENTRYPOINT ["dotnet", "run", "sleep 300"]
+RUN dotnet publish "ExemploDevOps.Api/ExemploDevOps.Api.csproj" -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "ExemploDevOps.Api.dll"]
