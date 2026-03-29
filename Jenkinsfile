@@ -30,7 +30,7 @@ pipeline {
         }
 
         stage('Deploy por Branch') {
-            agent { label 'aws-server' } 
+            agent { label 'aws-agent' } 
             steps {
                 script {
                     echo "🚀 Fazendo deploy da branch ${env.BRANCH_NAME} na AWS..."
