@@ -30,23 +30,24 @@ pipeline {
         }
 
         stage('Deploy por Branch') {
-            agent { label 'aws-agent' } 
+            agent { label 'aws-server' } 
             steps {
                 script {
                     echo "🚀 Fazendo deploy da branch ${env.BRANCH_NAME} na AWS..."
                     
-                    // Criamos um nome de container único por branch para elas não colidirem
-                    // Ex: container rodando em portas diferentes ou nomes diferentes
-                    def containerName = "${env.APP_NAME}-${env.BRANCH_NAME}"
+                    def cleanBranch = env.BRANCH_NAME.replaceAll(/[^a-zA-Z0-9.\-_]/, "-")
+                    def containerName = "${env.APP_NAME}-${cleanBranch}"
                     
+                    // 1. Calculamos a porta no Groovy
+                    def portValue = (env.BRANCH_NAME == 'main') ? '5000' : '5001'
+                    
+                    // 2. Passamos para o Shell usando interpolação de string do Groovy
                     sh """
                         docker rm -f ${containerName} || true
-                        docker pull ${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}
+                        docker pull ${env.IMAGE_NAME}:${cleanBranch}-${env.BUILD_ID}
                         
-                        # Exemplo: Se for a main, roda na 5000. Se for develop, na 5001.
-                        def port = (env.BRANCH_NAME == 'main') ? '5000' : '5001'
-                        
-                        docker run -d --name ${containerName} -p ${port}:8080 ${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}
+                        # Note que usamos ${portValue} para injetar o valor calculado acima
+                        docker run -d --name ${containerName} -p ${portValue}:8080 ${env.IMAGE_NAME}:${cleanBranch}-${env.BUILD_ID}
                     """
                 }
             }
