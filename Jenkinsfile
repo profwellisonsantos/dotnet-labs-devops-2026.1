@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME    = "weatherforecast"
-        BRANCH_NAME = "${env.BRANCH_NAME}"
+        BRANCH_NAME = "aula04"
         IMAGE_NAME  = "wellisonraul/${env.APP_NAME}"
     }
 
