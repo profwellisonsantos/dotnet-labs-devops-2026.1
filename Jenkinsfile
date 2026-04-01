@@ -12,23 +12,18 @@ pipeline {
             steps {
                 script {
                     // O 'SonarQube-Server' deve ser o nome configurado no System do Jenkins
-                    withSonarQubeEnv('SonarQube-Server') {
-                        echo "🛠️ Iniciando Build com análise SonarQube..."
-                        
-                        def fullImageName = "${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}"
-                        
-                        // Passamos o Token e a URL que o 'withSonarQubeEnv' nos dá para dentro do Docker
-                        app = docker.build(fullImageName, """
-                            --build-arg SONAR_TOKEN=${SONAR_AUTH_TOKEN} \
-                            --build-arg SONAR_HOST_URL=${SONAR_HOST_URL} \
-                            --build-arg APP_KEY=${env.APP_NAME} \
-                            .
-                        """)
-                        
-                        docker.withRegistry('https://registry.hub.docker.com/', 'dockerhub') {
-                            app.push()
-                            app.push("${env.BRANCH_NAME}-latest")
-                        }
+                    withSonarQubeEnv('SonarQube-Server') { 
+                        // 1. Definimos os argumentos em uma variável limpa
+                        // Usamos aspas duplas para o Groovy substituir as variáveis do Jenkins
+                        def sonarArgs = "--build-arg SONAR_TOKEN=${SONAR_AUTH_TOKEN} " +
+                                        "--build-arg SONAR_HOST_URL=${SONAR_HOST_URL} " +
+                                        "--build-arg APP_KEY=${env.APP_NAME}"
+                    
+                        echo "Iniciando build com os argumentos: ${sonarArgs}"
+                    
+                        // 2. Passamos a string de argumentos e o ponto final (contexto)
+                        // O segundo parâmetro do docker.build DEVE terminar com o ponto "."
+                        app = docker.build("${IMAGE_NAME}:${BRANCH_NAME}-${BUILD_ID}", "${sonarArgs} .")
                     }
                 }
             }
