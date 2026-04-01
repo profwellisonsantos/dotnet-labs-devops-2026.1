@@ -44,17 +44,14 @@ app.MapGet("/weatherforecast", () =>
 
 
 // --- CENÁRIO 2: RELIABILITY (Bugs / Grau A -> C) ---
-/*
 app.MapGet("/bug-null-reference", (string? nome) =>
 {
     // Isso vai gerar um Bug porque 'nome' pode ser nulo e estamos chamando ToUpper()
     return Results.Ok($"Olá, {nome.ToUpper()}"); 
 });
-*/
 
 
 // --- CENÁRIO 3: SECURITY & HOTSPOTS (Vulnerabilidades / Grau A -> D/E) ---
-/*
 app.MapGet("/seguranca-critica", (string senha) =>
 {
     // Hotspot: Uso de algoritmo de criptografia fraco/obsoleto (DES)
@@ -65,11 +62,9 @@ app.MapGet("/seguranca-critica", (string senha) =>
     
     return Results.Ok("Verifique o SonarQube agora!");
 });
-*/
 
 
 // --- CENÁRIO 4: DUPLICATION (Duplicidade de Código) ---
-/*
 // Copiar exatamente a mesma lógica do weatherforecast original gera alerta de duplicação
 app.MapGet("/previsao-copiada", () =>
 {
@@ -83,7 +78,6 @@ app.MapGet("/previsao-copiada", () =>
         .ToArray();
     return forecast;
 });
-*/
 
 app.Run();
 
