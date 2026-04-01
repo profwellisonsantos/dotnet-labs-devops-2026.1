@@ -3,49 +3,59 @@ pipeline {
 
     environment {
         APP_NAME    = "weatherforecast"
-        BRANCH_NAME = "${env.BRANCH_NAME}"
         IMAGE_NAME  = "wellisonraul/${env.APP_NAME}"
     }
 
     stages {
-        stage('Build e Push') {
+        stage('Build, Test e Sonar') {
             agent { label 'built-in' } 
             steps {
                 script {
-                    echo "🛠️ Compilando a branch: ${env.BRANCH_NAME}"
-                    
-                    // Taggeamos a imagem com o nome da branch + ID do build
-                    // Ex: wellisonraul/weatherforecast:develop-12
-                    def fullImageName = "${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}"
-                    
-                    app = docker.build(fullImageName, '.')
-                    
-                    docker.withRegistry('https://registry.hub.docker.com/', 'dockerhub') {
-                        app.push()
-                        // Também atualizamos a 'latest' daquela branch específica
-                        app.push("${env.BRANCH_NAME}-latest")
+                    // O 'SonarQube-Server' deve ser o nome configurado no System do Jenkins
+                    withSonarQubeEnv('SonarQube-Server') {
+                        echo "🛠️ Iniciando Build com análise SonarQube..."
+                        
+                        def fullImageName = "${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}"
+                        
+                        // Passamos o Token e a URL que o 'withSonarQubeEnv' nos dá para dentro do Docker
+                        app = docker.build(fullImageName, """
+                            --build-arg SONAR_TOKEN=${SONAR_AUTH_TOKEN} \
+                            --build-arg SONAR_HOST_URL=${SONAR_HOST_URL} \
+                            --build-arg APP_KEY=${env.APP_NAME} \
+                            .
+                        """)
+                        
+                        docker.withRegistry('https://registry.hub.docker.com/', 'dockerhub') {
+                            app.push()
+                            app.push("${env.BRANCH_NAME}-latest")
+                        }
                     }
                 }
             }
         }
 
+        stage("Quality Gate") {
+            agent { label 'built-in' }
+            steps {
+                // Aguarda o feedback do SonarQube para decidir se continua a pipeline
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Deploy por Branch') {
-            agent { label 'aws-server' } 
+            agent { label 'aws-agent' } 
             steps {
                 script {
                     echo "🚀 Fazendo deploy da branch ${env.BRANCH_NAME} na AWS..."
                     
-                    // Criamos um nome de container único por branch para elas não colidirem
-                    // Ex: container rodando em portas diferentes ou nomes diferentes
                     def containerName = "${env.APP_NAME}-${env.BRANCH_NAME}"
+                    def port = (env.BRANCH_NAME == 'main') ? '5000' : '5001'
                     
                     sh """
                         docker rm -f ${containerName} || true
                         docker pull ${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}
-                        
-                        # Exemplo: Se for a main, roda na 5000. Se for develop, na 5001.
-                        def port = (env.BRANCH_NAME == 'main') ? '5000' : '5001'
-                        
                         docker run -d --name ${containerName} -p ${port}:8080 ${env.IMAGE_NAME}:${env.BRANCH_NAME}-${env.BUILD_ID}
                     """
                 }
