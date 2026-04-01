@@ -1,5 +1,5 @@
 pipeline {
-    agent none 
+    agent aws-agent 
 
     environment {
         APP_NAME    = "weatherforecast"
@@ -7,7 +7,6 @@ pipeline {
     }
     stages {
         stage('Análise SonarQube (Fora do Docker)') {
-            agent { label 'aws-agent' }
             steps {
                 script {
                     withSonarQubeEnv('SonarQube-Server') {
@@ -40,7 +39,6 @@ pipeline {
         }
 
         stage("Quality Gate") {
-            agent { label 'built-in' }
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
@@ -49,7 +47,6 @@ pipeline {
         }
     
         stage('Build e Push Imagem Limpa') {
-            agent { label 'aws-agent' }
             steps {
                 script {
                     def fullImageName = "${IMAGE_NAME}:${BRANCH_NAME}-${BUILD_ID}"
@@ -64,7 +61,6 @@ pipeline {
         }
     
         stage('Deploy por Branch') {
-            agent { label 'aws-agent' } 
             steps {
                 script {
                     def containerName = "${env.APP_NAME}-${env.BRANCH_NAME}"
