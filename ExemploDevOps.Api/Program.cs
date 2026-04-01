@@ -17,8 +17,8 @@ app.UseHttpsRedirection();
 
 // --- CENÁRIO 1: MAINTAINABILITY (Code Smells / Grau A -> B) ---
 // Descomente as linhas abaixo para gerar "Dívida Técnica"
-// string tokenInutilizado = "S0M3_S3CR3T_T0K3N"; // Variável declarada e nunca usada
-// int x = 10; // Comentário óbvio: atribuindo 10 a x
+string tokenInutilizado = "S0M3_S3CR3T_T0K3N"; // Variável declarada e nunca usada
+int x = 10; // Comentário óbvio: atribuindo 10 a x
 
 
 var summaries = new[]
