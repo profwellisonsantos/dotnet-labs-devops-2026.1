@@ -1,0 +1,38 @@
+---
+- name: Baixar a chave do repositório Jenkins
+  get_url:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+    dest: /usr/share/keyrings/jenkins-keyring.asc
+
+- name: Adicionar o repositório oficial do Jenkins
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+
+- name: Atualizar o cache do repositório apt
+  apt:
+    update_cache: yes
+
+- name: Instalar o pacote Jenkins
+  apt:
+    name: jenkins
+    state: present
+
+- name: Iniciar e habilitar o serviço Jenkins
+  systemd:
+   name: jenkins
+   state: started
+   enabled: yes
+
+- name: Aguardar a geração da senha inicial do admin
+  wait_for:
+   path: /var/lib/jenkins/secrets/initialAdminPassword
+
+- name: Ler a senha inicial para exibir no console
+  command: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: admin_password
+  changed_when: false
+
+- name: Exibir a senha do Jenkins
+  debug:
+   msg: "A senha inicial do Admin é: {{ admin_password.stdout }}"

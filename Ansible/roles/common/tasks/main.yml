@@ -1,0 +1,11 @@
+---
+- name: Atualizar o cache do repositório apt
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install a list of packages
+  ansible.builtin.apt:
+    pkg:
+    - fontconfig
+    - openjdk-21-jre

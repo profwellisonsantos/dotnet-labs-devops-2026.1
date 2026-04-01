@@ -1,0 +1,18 @@
+---
+# 1. Aplicar a todos os servidores
+- hosts: all
+  become: yes
+  roles:
+    - common
+
+# 2. Aplicar apenas ao servidor Master (IP Público)
+- hosts: jenkins_master
+  become: yes
+  roles:
+    - jenkins_master
+
+# 3. Aplicar apenas ao servidor Agent (IP Público)
+- hosts: jenkins_agent
+  become: yes
+  roles:
+    - jenkins_agent

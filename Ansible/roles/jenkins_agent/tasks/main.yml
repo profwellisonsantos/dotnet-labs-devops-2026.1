@@ -1,0 +1,61 @@
+---
+- name: Instalar dependências do Docker
+  apt:
+    name:
+      - ca-certificates
+      - curl
+    state: present
+    update_cache: yes
+
+- name: Criar diretório para chaves do APT
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Baixar chave GPG oficial do Docker
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: 'a+r'
+
+- name: Adicionar repositório oficial do Docker
+  apt_repository:
+    repo: >
+      deb [arch={{ ansible_architecture == 'x86_64' and 'amd64' or 'arm64' }} 
+      signed-by=/etc/apt/keyrings/docker.asc] 
+      https://download.docker.com/linux/ubuntu 
+      {{ ansible_distribution_release }} stable
+    state: present
+    filename: docker
+
+- name: Instalar Docker CE e Plugins
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+
+- name: Garantir que o serviço Docker está rodando
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Adicionar o usuário 'ubuntu' ao grupo docker
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes
+
+- name: Criar diretório para o workspace do Jenkins
+  file:
+    path: /home/ubuntu/jenkins_workspace
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'
