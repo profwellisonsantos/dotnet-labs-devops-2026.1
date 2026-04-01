@@ -1,5 +1,5 @@
 pipeline {
-    agent aws-agent 
+    agent {'aws-agent'}
 
     environment {
         APP_NAME    = "weatherforecast"
