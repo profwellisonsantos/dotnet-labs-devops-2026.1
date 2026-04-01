@@ -7,7 +7,7 @@ pipeline {
     }
     stages {
         stage('Análise SonarQube (Fora do Docker)') {
-            agent { label 'built-in' }
+            agent { label 'aws-agent' }
             steps {
                 script {
                     withSonarQubeEnv('SonarQube-Server') {
@@ -49,7 +49,7 @@ pipeline {
         }
     
         stage('Build e Push Imagem Limpa') {
-            agent { label 'built-in' }
+            agent { label 'aws-agent' }
             steps {
                 script {
                     def fullImageName = "${IMAGE_NAME}:${BRANCH_NAME}-${BUILD_ID}"
