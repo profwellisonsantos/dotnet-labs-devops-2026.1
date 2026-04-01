@@ -10,14 +10,14 @@ pipeline {
    
 
     stages {
-         stage('Carregando variáveis do Infisical') {
+        stage('Carregando variáveis do Infisical') {
             agent { label 'aws-agent' }
             steps {
                 script{
                     node(){
                         withInfisical(
                         configuration: [
-                            infisicalCredentialId: 'infisical',
+                            infisicalCredentialId: 'Infisical',
                             infisicalEnvironmentSlug: 'dev', 
                             infisicalProjectSlug: 'aula03-4-aak', 
                             infisicalUrl: 'https://app.infisical.com'
@@ -44,6 +44,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Build e Push') {
             agent { label 'aws-agent' } 
