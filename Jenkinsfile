@@ -32,9 +32,11 @@ pipeline {
         stage("Quality Gate") {
             agent { label 'built-in' }
             steps {
-                // Aguarda o feedback do SonarQube para decidir se continua a pipeline
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                // Agora o Jenkins sabe que deve olhar para o 'SonarQube-Server'
+                withSonarQubeEnv('SonarQube-Server') {
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
                 }
             }
         }
