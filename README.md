@@ -5,32 +5,42 @@ Professor: Wellison Raul Mariz Santos | Instituto Infnet
 
 Bem-vindo ao repositório central dos nossos laboratórios de DevOps. Este projeto está organizado por **branches**, onde cada uma contém o código prático, os scripts e as instruções específicas para cada aula.
 
+
+
 📌 Organização das Aulas
 ------------------------
 
 Para acessar o conteúdo de uma aula específica, você deve alternar para a branch correspondente:
 
-### 🔹 Aula 02: Automação com Jenkins (CI/CD)
+| Aula | Tema Principal | Tecnologias-Chave | Branch |
+| :--- | :--- | :--- | :--- |
+| **02** | Automação CI/CD | Jenkins, Pipelines, AWS EC2 | `aula-02` |
+| **03** | Infraestrutura como Código (IaC) | Terraform, Ansible, .NET Runtime | `aula-03` |
+| **04** | Containerização & CD | Docker (Multi-stage), Docker Hub, Jenkins | `aula-04` |
+| **05** | Qualidade de Software | TDD, xUnit, Coverlet, Stryker.NET | `aula-05` |
+| **06** | Continuous Inspection | Jenkins, SonarQube (Webhooks, Quality Gate) | `aula-06` |
+| **06+** | Secret Management | Infisical, Machine Identities, Jenkins | `aula-06-infisical` |
 
+### Aula 02: Automação com Jenkins (CI/CD)
 
-Focada na criação de pipelines de integração e entrega contínua.
+Focada na criação de pipelines de integração e de entrega contínua.
 
 *   **Branch:** aula-02
     
-*   **Conteúdo:** Jenkinsfile, scripts de automação de build e deploy para instâncias AWS.
+*   **Conteúdo:** Jenkinsfile, scripts de automação de build e deploy para instâncias da AWS.
     
 
-### 🔹 Aula 03: Infraestrutura como Código (IaC)
+### Aula 03: Infraestrutura como Código (IaC)
 
-Exploração de ferramentas para provisionamento e configuração automatizada.
+Exploração de ferramentas para provisionamento e configuração automatizados.
 
 *   **Branch:** aula-03
     
-*   **Conteúdo:** Arquivos .tf do Terraform para provisionamento de EC2/Security Groups e Playbooks do Ansible para configuração de runtime .NET.
+* **Conteúdo:** Arquivos .tf do Terraform para o provisionamento de EC2/Security Groups e Playbooks do Ansible para a configuração do runtime .NET.
 
-### 🔹 Aula 04: Dockerização (O fim do "Na minha máquina funciona")
+### Aula 04: Dockerização
 
-Introdução ao **Docker** com foco em **Multi-stage Builds**.
+Introdução ao **Docker**.
 
 *   **Build Stage:** SDK .NET para compilação e testes.
     
@@ -38,26 +48,23 @@ Introdução ao **Docker** com foco em **Multi-stage Builds**.
     
 *   **Deploy:** Implementação de isolamento de portas (Porta 5000 para Main, 5001 para Develop).
     
+### Aula 05: Engenharia de Qualidade (TDD & Mutação)
 
-### 🔹 Aula 05: Engenharia de Qualidade (TDD & Mutação)
-
-Focada em métricas reais de qualidade. Não apenas "escrever testes", mas validar a eficácia deles.
+Focada em métricas reais de qualidade. Não apenas escrever testes, mas também validar sua eficácia.
 
 *   **Ciclo TDD:** Red-Green-Refactor.
     
-*   **Cobertura:** Uso do **Coverlet** e geradores de relatórios HTML.
+*   **Cobertura:** Uso do **Coverlet** e de geradores de relatórios em HTML.
     
 *   **Stryker.NET:** Testes de mutação para garantir que os testes realmente "matam" bugs propositais.
-    
 
-### 🔹 Aula 06: Ciclo de Vida e Segurança (SonarQube & Infisical)
+### Aula 06: Ciclo de Vida e Segurança (SonarQube & Infisical)
 
 O fechamento do pipeline com foco em governança e segurança de dados sensíveis.
 
-*   **SonarQube:** Integração com **Webhooks** e **Quality Gates** que bloqueiam o deploy se a dívida técnica for alta.
+*   **SonarQube:** Integração com **Webhooks** e **Quality Gates** que bloqueiam o deploy quando a dívida técnica for elevada.
     
 *   **Infisical:** Gestão centralizada de segredos via **Machine Identities**, eliminando variáveis hardcoded nos Jenkinsfiles.
-    
 
 🛠️ Como navegar entre as aulas
 -------------------------------
