@@ -21,6 +21,8 @@ Para acessar o conteúdo de uma aula específica, você deve alternar para a bra
 | **06** | Continuous Inspection | Jenkins, SonarQube (Webhooks, Quality Gate) | `aula-06` |
 | **06+** | Secret Management | Infisical, Machine Identities, Jenkins | `aula-06-infisical` |
 
+## Detalhamento dos Laboratórios
+
 ### Aula 02: Automação com Jenkins (CI/CD)
 
 Focada na criação de pipelines de integração e de entrega contínua.
@@ -29,7 +31,6 @@ Focada na criação de pipelines de integração e de entrega contínua.
     
 *   **Conteúdo:** Jenkinsfile, scripts de automação de build e deploy para instâncias da AWS.
     
-
 ### Aula 03: Infraestrutura como Código (IaC)
 
 Exploração de ferramentas para provisionamento e configuração automatizados.
