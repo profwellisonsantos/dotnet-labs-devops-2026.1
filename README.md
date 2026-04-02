@@ -1,90 +1,106 @@
-Esta branch demonstra a implementação de uma pipeline de CI/CD utilizando **Jenkins** para automação, **SonarQube** para análise de qualidade de código e **Docker** para deploy.
+Aula 05: Qualidade de Software com .NET
+==========================================
 
-📋 Pré-requisitos
------------------
+### TDD, Testes Unitários (xUnit), Cobertura e Testes de Mutação
 
-*   **Jenkins** com os plugins: SonarQube Scanner e Docker Pipeline.
+Este módulo faz parte do laboratório de DevOps 2026.1 e foca em garantir que o código não apenas funcione, mas seja resiliente, testável e de fácil manutenção.
+
+🎯 Objetivos da Aula
+--------------------
+
+*   Compreender e aplicar o fluxo **TDD (Test-Driven Development)**.
     
-*   **SonarQube Server** ativo (via Docker ou instalação local).
+*   Implementar testes unitários utilizando o framework **xUnit**.
     
-*   **Agente Jenkins** com SDK .NET e Docker instalados.
+*   Analisar a eficácia dos testes através da **Cobertura de Código (Code Coverage)**.
+    
+*   Validar a qualidade dos testes com **Testes de Mutação (Stryker.NET)**.
     
 
-Passo 1: Configuração no SonarQube
---------------------------------------
+🛠️ Tecnologias Utilizadas
+--------------------------
 
-1.  **Gerar Token de Acesso:**
+*   **.NET 8/9 SDK**
     
-    *   No SonarQube, vá em My Account > Security.
+*   **xUnit:** Framework de testes unitários.
         
-    *   Gere um token do tipo **User Token** e guarde-o.
-        
-2.  **Nota:** Certifique-se de que a barra / ao final da URL esteja presente.
+*   **Coverlet:** Coletor de cobertura de código cross-platform.
     
-    *   Vá em Administration > Configuration > Webhooks.
-        
-    *   Clique em **Create**.
-        
-    *   **Name:** Jenkins-Webhook
-        
-    *   **URL:** http://IP_JENKINS:8080/sonarqube-webhook/
-        
-
-Passo 2: Configuração no Jenkins
------------------------------------
-
-### 1\. Credenciais
-
-Vá em Manage Jenkins > Credentials e adicione:
-
-*   **SonarQube Token:** Secret Text (use o token gerado no passo anterior). ID sugerido: SONAR\_AUTH\_TOKEN.
-    
-*   **DockerHub:** Username with password. ID sugerido: dockerhub. Lembre-se que a senha do do DockerHub também precisa ser um Token. 
+*   **Stryker.NET:** Ferramenta para testes de mutação.
     
 
-### 2\. Configurar o System Server
+📑 Conteúdo Programático
+------------------------
 
-1.  Vá em Manage Jenkins > System.
+### 1\. TDD (Test-Driven Development)
+
+Praticamos o ciclo **Red-Green-Refactor**:
+
+1.  🔴 **Red:** Escrevemos um teste que falha para uma funcionalidade que ainda não existe.
     
-2.  Procure por **SonarQube servers**.
+2.  🟢 **Green:** Escrevemos o código mínimo necessário para o teste passar.
     
-3.  Adicione um servidor:
+3.  🔵 **Refactor:** Melhoramos o código mantendo o teste passando.
     
-    *   **Name:** SonarQube-Server (deve ser igual ao usado no Jenkinsfile).
-        
-    *   **Server URL:** URL do seu servidor SonarQube.
-        
-    *   **Server authentication token:** Selecione a credencial que você criou.
-        
 
-A Pipeline (Jenkinsfile)
----------------------------
+### 2\. Testes Unitários com xUnit
 
-A pipeline realiza a análise estática antes de buildar a imagem Docker final. Se o código não passar no **Quality Gate**, o deploy é abortado automaticamente.
+Diferenciamos os dois tipos principais de testes no xUnit:
 
-
-Explicação dos Pontos Chave
-------------------------------
-
-### 1\. withSonarQubeEnv
-
-Este comando do plugin do Jenkins garante que a pipeline saiba para qual servidor enviar os dados. Ele injeta variáveis como ${SONAR\_HOST\_URL} e ${SONAR\_AUTH\_TOKEN} dinamicamente.
-
-### 2\. waitForQualityGate
-
-Este é o ponto de controle. Sem o **Webhook** configurado no SonarQube apontando para o Jenkins, este stage ficaria em loop infinito até o timeout. Ele permite que a pipeline seja interrompida se o índice de bugs ou vulnerabilidades estiver acima do permitido.
-
-### 3\. Coleta de Cobertura (Code Coverage)
-
-No comando dotnet test, usamos o formato opencover. O SonarQube lê esse arquivo para mostrar a porcentagem de código testado na interface gráfica.
-
-Como Executar
-----------------
-
-1.  Certifique-se de que o SonarQube está rodando.
+*   \[Fact\]: Testes que são sempre verdadeiros, testando uma condição invariável.
     
-2.  Crie um novo item de MultiBranch Pipeline no Jenkins.
+*   \[Theory\]: Testes que aceitam parâmetros (\[InlineData\]), permitindo testar múltiplos cenários com o mesmo método.
     
-3.  Aponte para o repositório Git que contém este arquivo.
+
+### 3\. Cobertura de Código
+
+Não basta ter testes, precisamos saber o que eles cobrem. Utilizamos o **Coverlet** para gerar relatórios de cobertura.
+
+> **Desafio:** Atingir 80% de cobertura não garante ausência de bugs! É aqui que entra o próximo tópico.
+
+### 4\. Testes de Mutação (Stryker)
+
+O Stryker introduz <i>bugs</i> propositais (mutantes) no seu código. Se os seus testes continuarem passando mesmo com o código alterado, o mutante **sobreviveu**, indicando que seu teste é fraco. Se o teste falhar, o mutante foi **morto**.
+
+🚀 Como Executar os Testes
+--------------------------
+
+### Executar Testes Unitários
+
+`   dotnet test   `
+
+### Gerar Relatório de Cobertura
+
+1. `dotnet add package coverlet.collector`
+2. `dotnet test --collect:"XPlat Code Coverage"`
+3. `dotnet tool install -g dotnet-reportgenerator-globaltool`
+4. `reportgenerator -reports:"FreteCore.Tests/TestResults/*/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html`
+
+### Executar Testes de Mutação (Stryker)
+
+Certifique-se de ter o Stryker instalado:
+
+`dotnet tool install -g dotnet-stryker`
+
+Para rodar no projeto de testes:
+
+`dotnet stryker`
+
+📊 Discussões em Aula
+---------------------
+
+*   **Pirâmide de Testes:** Por que focar tanto em testes unitários?
     
-4.  Execute o Build.
+*   **Mocking:** Quando isolar dependências externas?
+    
+*   **Cobertura vs. Qualidade:** Por que 100% de cobertura pode ser uma métrica vaidosa se os asserts forem ruins.
+    
+
+🔗 Links Úteis
+--------------
+
+*   [Documentação xUnit](https://xunit.net/)
+    
+*   [Stryker.NET Docs](https://stryker-mutator.io/docs/stryker-net/introduction/)
+    
+*   [FluentAssertions](https://fluentassertions.com/)
