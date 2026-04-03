@@ -33,3 +33,15 @@ jobs:
         run: |
           docker build -t "${{ env.DOCKER_USERNAME }}/calculadora:latest" .
           docker push "${{ env.DOCKER_USERNAME }}/calculadora:latest"
+
+      - name: Run and Print Logs
+        run: |
+          docker run -d --name calculadora-app -p 5001:8080 ${{ env.DOCKER_USERNAME }}/calculadora:latest
+          sleep 10
+    
+          echo "--- LOGS DO CONTAINER ---"
+          docker logs calculadora-app
+          
+          docker ps -a | grep calculadora-app
+          
+          docker rm -f calculadora-app
