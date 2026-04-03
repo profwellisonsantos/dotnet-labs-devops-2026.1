@@ -25,17 +25,24 @@ jobs:
           project-slug: "aula03-4-aak"      # Your Infisical project slug
           env-slug: "dev"                        # Your environment slug
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
       - name: Login to Docker Registry
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t "$DOCKER_USERNAME/calculadora:latest" \
-          --build-arg data1="$data1" \
-          --build-arg data2="$data2" .
-
-          docker push "${{ env.DOCKER_USERNAME }}/calculadora:latest"
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: "$DOCKER_USERNAME/calculadora:latest"
+          build-args: |
+            data1="$data1"
+            data2="$data2"
 
       - name: Run and Print Logs
         run: |
