@@ -26,7 +26,7 @@ jobs:
           env-slug: "dev"                        # Your environment slug
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        uses: docker/login-action@v4
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
