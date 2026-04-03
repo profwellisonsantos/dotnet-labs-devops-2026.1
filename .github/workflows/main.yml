@@ -31,5 +31,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t "$DOCKER_USERNAME"/calculadora:latest .
-          docker push "$DOCKER_USERNAME"/calculadora:latest
+          docker build -t "${{ env.DOCKER_USERNAME }}/calculadora:latest" .
+          docker push "${{ env.DOCKER_USERNAME }}/calculadora:latest"
