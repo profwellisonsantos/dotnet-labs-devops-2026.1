@@ -31,7 +31,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t --build-arg data1=${env.data1} --build-arg data2=${env.data2} "${{ env.DOCKER_USERNAME }}/calculadora:latest" .
+          docker build -t "${{ env.DOCKER_USERNAME }}/calculadora:latest" --build-arg data1=${env.data1} --build-arg data2=${env.data2} .
           docker push "${{ env.DOCKER_USERNAME }}/calculadora:latest"
 
       - name: Run and Print Logs
