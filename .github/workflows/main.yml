@@ -32,13 +32,13 @@ jobs:
           password: ${{ env.DOCKER_PASSWORD }}
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
-          tags: "$DOCKER_USERNAME/calculadora:latest"
+          tags: ${{ env.DOCKER_USERNAME }}/calculadora:latest
           build-args: |
-            data1="$data1"
-            data2="$data2"
+            data1=${{ env.data1 }}
+            data2=${{ env.data2 }}
 
       - name: Run and Print Logs
         run: |
