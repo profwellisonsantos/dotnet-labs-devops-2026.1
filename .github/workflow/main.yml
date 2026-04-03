@@ -1,8 +1,11 @@
 name: Build and Push Docker Image
 
 on:
-  workflow_dispatch:  # Manual trigger for testing
-
+  # Escolha o gatilho:
+  push:
+    branches: [ "aula06-infisical-ga" ] # Roda quando você der push na main
+  workflow_dispatch:
+  
 permissions:
   id-token: write  # Required for OIDC authentication
   contents: read   # Required for checking out code
