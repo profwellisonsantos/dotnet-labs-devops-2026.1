@@ -1,0 +1,6 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ "aula06-infisical-ga" ] # Roda quando você der push na main
+  workflow_dispatch:
