@@ -1,0 +1,32 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_dispatch:  # Manual trigger for testing
+
+permissions:
+  id-token: write  # Required for OIDC authentication
+  contents: read   # Required for checking out code
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fetch secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.9
+        with:
+          method: "oidc"
+          identity-id: "a3d97c6d-2bd6-4790-86cb-8f1562cde64e"  # From Step 4
+          project-slug: "aula03-4-aak"      # Your Infisical project slug
+          env-slug: "dev"                        # Your environment slug
+
+      - name: Login to Docker Registry
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-image:latest .
+          docker push my-image:latest
