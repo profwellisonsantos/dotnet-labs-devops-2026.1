@@ -39,10 +39,13 @@ jobs:
           build-args: |
             data1=${{ env.data1 }}
             data2=${{ env.data2 }}
-
+          
+  deploy:
+    runs-on: aws
+    steps:
       - name: Run and Print Logs
         run: |
-          docker run -d --name calculadora-app -p 5001:8080 ${{ env.DOCKER_USERNAME }}/calculadora:latest
+          docker run -d --name calculadora-app -p 5001:8080 wellisonraul/calculadora:latest
           sleep 10
     
           echo "--- LOGS DO CONTAINER ---"
