@@ -42,6 +42,7 @@ jobs:
           
   deploy:
     runs-on: aws
+    needs: [build]
     steps:
       - name: Run and Print Logs
         run: |
