@@ -1,0 +1,73 @@
+{
+  "title": "Infrastructure Overview (Telegraf) - Prof. Wellison",
+  "panels": [
+    { "title": "RECURSOS DO HOST (VOSTRO 5490)", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 } },
+    {
+      "title": "CPU Usage Total %",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "targets": [{ "expr": "100 - cpu_usage_idle{cpu=\"cpu-total\"}" }],
+      "fieldConfig": { "defaults": { "unit": "percent", "color": { "mode": "thresholds", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }] } } }
+    },
+    {
+      "title": "Memória Disponível (%)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+      "targets": [{ "expr": "mem_available_percent" }],
+      "fieldConfig": { "defaults": { "unit": "percent", "color": { "mode": "thresholds", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 20 }] } } }
+    },
+    {
+      "title": "Load Average (1m)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+      "targets": [{ "expr": "system_load1" }]
+    },
+    {
+      "title": "Uptime (Horas)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "targets": [{ "expr": "system_uptime / 3600" }],
+      "fieldConfig": { "defaults": { "unit": "h" } }
+    },
+    { "title": "ANÁLISE DE PROCESSAMENTO E DISCO", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 } },
+    {
+      "title": "CPU Breakdown (User/System/IOWait)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        { "expr": "cpu_usage_user{cpu=\"cpu-total\"}", "legendFormat": "User" },
+        { "expr": "cpu_usage_system{cpu=\"cpu-total\"}", "legendFormat": "System" },
+        { "expr": "cpu_usage_iowait{cpu=\"cpu-total\"}", "legendFormat": "IOWait" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "title": "I/O de Disco (Leitura/Escrita Bytes)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "targets": [
+        { "expr": "rate(diskio_read_bytes[1m])", "legendFormat": "Read" },
+        { "expr": "rate(diskio_write_bytes[1m])", "legendFormat": "Write" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "binBps" } }
+    },
+    { "title": "REDE E CONTEXTO DO KERNEL", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 } },
+    {
+      "title": "Tráfego de Rede Host (Bits/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "targets": [
+        { "expr": "rate(net_bytes_recv[1m]) * 8", "legendFormat": "Download" },
+        { "expr": "rate(net_bytes_sent[1m]) * 8", "legendFormat": "Upload" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bps" } }
+    },
+    {
+      "title": "Context Switches (Trocas de Contexto)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "targets": [{ "expr": "rate(kernel_context_switches[1m])", "legendFormat": "Switches/s" }]
+    }
+  ],
+  "schemaVersion": 38
+}

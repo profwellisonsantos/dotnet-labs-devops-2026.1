@@ -1,0 +1,11 @@
+groups:
+  - name: AlertasAplicacao
+    rules:
+      - alert: SalesApiForaDoAr
+        expr: up{job="sales-api"} == 0 
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRÍTICO: Sales-API Inalcançável"
+          description: "O serviço {{ $labels.job }} (instância {{ $labels.instance }}) parou de responder ao Prometheus."

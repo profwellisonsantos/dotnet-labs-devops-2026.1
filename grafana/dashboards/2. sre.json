@@ -1,0 +1,41 @@
+{
+  "title": "SRE Full Stack - Aula Prof. Wellison",
+  "panels": [
+    {
+      "title": "Saturação: Uso de CPU (Host vs Containers)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "sum(rate(docker_container_cpu_usage_percent[1m])) by (container_name)", "legendFormat": "Container: {{container_name}}" },
+        { "expr": "cpu_usage_idle{cpu=\"cpu-total\"}", "legendFormat": "Host Idle %" }
+      ]
+    },
+    {
+      "title": "Saturação: I/O de Disco (NVMe)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "rate(diskio_io_time{name=\"nvme0n1\"}[1m])", "legendFormat": "Tempo de I/O (ms)" },
+        { "expr": "diskio_iops_in_progress", "legendFormat": "Fila de Operações" }
+      ]
+    },
+    {
+      "title": "Tráfego de Rede por Container",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "rate(docker_container_net_rx_bytes[1m])", "legendFormat": "Recebido: {{container_name}}" },
+        { "expr": "rate(docker_container_net_tx_bytes[1m])", "legendFormat": "Enviado: {{container_name}}" }
+      ]
+    },
+    {
+      "title": "Memória: Disponível vs Usada (Host)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "mem_available", "legendFormat": "Disponível" },
+        { "expr": "mem_used", "legendFormat": "Em uso" }
+      ]
+    }
+  ]
+}

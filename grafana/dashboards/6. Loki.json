@@ -1,0 +1,47 @@
+{
+  "title": "Loki Log Analytics - Prof. Wellison",
+  "panels": [
+    { "title": "VISÃO GERAL DE VOLUMES", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 } },
+    {
+      "title": "Logs por Container (Rate)",
+      "type": "timeseries",
+      "datasource": { "type": "loki" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+      "targets": [{ "expr": "sum by (container) (rate({container=~\".+\"}[1m]))", "legendFormat": "{{container}}" }]
+    },
+    {
+      "title": "Ocorrências de 'Error' ou 'Fail' (Global)",
+      "type": "timeseries",
+      "datasource": { "type": "loki" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "targets": [{ "expr": "sum(count_over_time({container=~\".+\"} |= \"error\" [1m]))", "legendFormat": "Erros Detectados" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "red" } } }
+    },
+    { "title": "EXPLORADOR DE LOGS EM TEMPO REAL", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 } },
+    {
+      "title": "Últimos Logs do Sistema (/var/log)",
+      "type": "logs",
+      "datasource": { "type": "loki" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 10 },
+      "targets": [{ "expr": "{job=\"varlogs\"}", "refId": "A" }],
+      "options": { "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true }
+    },
+    { "title": "SECURITY & AUDIT", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 } },
+    {
+      "title": "Acessos Negados / Auth Failures",
+      "type": "stat",
+      "datasource": { "type": "loki" },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 21 },
+      "targets": [{ "expr": "sum(count_over_time({job=\"varlogs\"} |= \"failure\" [30m]))" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}] } } }
+    },
+    {
+      "title": "Logs da Aplicação Sales-API",
+      "type": "logs",
+      "datasource": { "type": "loki" },
+      "gridPos": { "h": 6, "w": 16, "x": 8, "y": 21 },
+      "targets": [{ "expr": "{container=\"sales-api\"}", "refId": "A" }]
+    }
+  ],
+  "schemaVersion": 38
+}

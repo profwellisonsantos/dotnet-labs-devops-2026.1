@@ -1,0 +1,18 @@
+route:
+  # Agrupa alertas com o mesmo nome para não inundar o log
+  group_by: ['alertname']
+  # Tempo que o AlertManager espera para ver se chegam mais alertas antes de enviar
+  group_wait: 10s 
+  group_interval: 5m
+  repeat_interval: 1h
+  # Para qual "caixa de saída" o alerta vai por padrão
+  receiver: 'webhook-externo'
+
+receivers:
+  - name: 'webhook-externo'
+    webhook_configs:
+      - url: 'https://webhook.site/be6d4226-140f-4710-aff1-beb485474e87' # Meu Weebhook, modifique para o teu.
+
+  - name: 'log-local'
+    # Este receiver fica aqui apenas como referência, 
+    # pois o AlertManager já mostra tudo na UI (porta 9093) por padrão.

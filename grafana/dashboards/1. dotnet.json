@@ -1,0 +1,98 @@
+{
+  "title": "Application Deep Dive - ASP.NET Core Observability",
+  "timezone": "browser",
+  "panels": [
+    { "title": "MÉTRICAS EM TEMPO REAL (ESTADO ATUAL)", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 } },
+    {
+      "title": "Requisições Totais (1h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "targets": [{ "expr": "sum(increase(http_requests_received_total[1h]))" }],
+      "options": { "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "title": "RPS Atual",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "targets": [{ "expr": "sum(rate(http_requests_received_total[1m]))" }],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "title": "Latência Média (Global)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "targets": [{ "expr": "sum(rate(http_request_duration_seconds_sum[1m])) / sum(rate(http_request_duration_seconds_count[1m]))" }],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "Erros 5xx (5m)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "targets": [{ "expr": "sum(increase(http_requests_received_total{code=~\"5..\"}[5m]))" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } } }
+    },
+    {
+      "title": "Thread Count",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "targets": [{ "expr": "process_num_threads" }]
+    },
+    {
+      "title": "Uptime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "targets": [{ "expr": "time() - process_start_time_seconds" }],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    { "title": "ANÁLISE DE ENDPOINTS E TRÁFEGO", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 } },
+    {
+      "title": "Distribuição de Volume por Endpoint",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 6 },
+      "targets": [{ "expr": "sum(rate(http_requests_received_total[5m])) by (endpoint)", "legendFormat": "{{endpoint}}" }]
+    },
+    {
+      "title": "Taxa de Requisições por Segundo (por Endpoint)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 6 },
+      "targets": [{ "expr": "sum(rate(http_requests_received_total[1m])) by (endpoint)", "legendFormat": "{{endpoint}}" }]
+    },
+    {
+      "title": "Latência P99 (Linha do Tempo)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "targets": [{ "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, endpoint))", "legendFormat": "P99: {{endpoint}}" }],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "Mapa de Calor de Latência (Distribuição)",
+      "type": "heatmap",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "targets": [{ "expr": "sum(rate(http_request_duration_seconds_bucket[5m])) by (le)", "format": "heatmap" }],
+      "options": { "calculate": false, "color": { "mode": "scheme", "scheme": "Oranges" } }
+    },
+    { "title": "SAÚDE, ERROS E SEGURANÇA", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 } },
+    {
+      "title": "Status Codes (Distribuição)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+      "targets": [{ "expr": "sum(rate(http_requests_received_total[1m])) by (code)", "legendFormat": "Status {{code}}" }]
+    },
+    {
+      "title": "Erros 4xx vs 5xx por Rota",
+      "type": "barchart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+      "targets": [
+        { "expr": "sum(rate(http_requests_received_total{code=~\"4..\"}[1m])) by (endpoint)", "legendFormat": "Erro 4xx: {{endpoint}}" },
+        { "expr": "sum(rate(http_requests_received_total{code=~\"5..\"}[1m])) by (endpoint)", "legendFormat": "Erro 5xx: {{endpoint}}" }
+      ]
+    },
+    {
+      "title": "Exceções do Runtime .NET",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 31 },
+      "targets": [{ "expr": "rate(system_runtime_exception_count_total[1m])", "legendFormat": "Exceptions/s" }]
+    }
+  ],
+  "schemaVersion": 38
+}

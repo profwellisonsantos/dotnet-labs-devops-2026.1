@@ -1,0 +1,77 @@
+{
+  "title": "Docker Observability - Prof. Wellison",
+  "panels": [
+    { "title": "INVENTÁRIO E SAÚDE DO DAEMON", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 } },
+    {
+      "title": "Containers Rodando",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "targets": [{ "expr": "docker_n_containers_running" }]
+    },
+    {
+      "title": "Containers Parados",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+      "targets": [{ "expr": "docker_n_containers_stopped" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } } }
+    },
+    {
+      "title": "Imagens no Host",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+      "targets": [{ "expr": "docker_n_images" }]
+    },
+    {
+      "title": "File Descriptors em Uso",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "targets": [{ "expr": "docker_n_used_file_descriptors" }]
+    },
+    { "title": "PERFORMANCE: CPU E MEMÓRIA", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 } },
+    {
+      "title": "CPU % por Container",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [{ "expr": "docker_container_cpu_usage_percent", "legendFormat": "{{container_name}}" }]
+    },
+    {
+      "title": "Uso de Memória RAM (Bytes)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "targets": [{ "expr": "docker_container_mem_usage", "legendFormat": "{{container_name}}" }],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "title": "CPU Throttling (Penalização)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "targets": [{ "expr": "rate(docker_container_cpu_throttling_periods[1m])", "legendFormat": "Throttling: {{container_name}}" }]
+    },
+    {
+      "title": "% da Memória vs Limite",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "targets": [{ "expr": "docker_container_mem_usage / docker_container_mem_limit * 100", "legendFormat": "{{container_name}}" }]
+    },
+    { "title": "REDE E I/O DE DISCO", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 } },
+    {
+      "title": "Rede: Bytes Recebidos (RX)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+      "targets": [{ "expr": "rate(docker_container_net_rx_bytes[1m])", "legendFormat": "RX: {{container_name}}" }]
+    },
+    {
+      "title": "Rede: Bytes Enviados (TX)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+      "targets": [{ "expr": "rate(docker_container_net_tx_bytes[1m])", "legendFormat": "TX: {{container_name}}" }]
+    },
+    {
+      "title": "Escrita em Disco (Bytes/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 31 },
+      "targets": [{ "expr": "rate(docker_container_blkio_io_service_bytes_recursive_write[1m])", "legendFormat": "Write: {{container_name}}" }]
+    }
+  ],
+  "schemaVersion": 38
+}

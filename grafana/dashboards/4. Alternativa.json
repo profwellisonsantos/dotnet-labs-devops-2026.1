@@ -1,0 +1,76 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "MÉTRICAS DE NEGÓCIO (MÉTODO RED)",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "title": "Requisições por Segundo",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 1 },
+      "targets": [{ "expr": "sum(rate(http_requests_received_total[1m])) by (endpoint)", "legendFormat": "{{endpoint}}" }]
+    },
+    {
+      "title": "Latência P95 (Tempo de Resposta)",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 1 },
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, endpoint))", "legendFormat": "{{endpoint}} (P95)" }]
+    },
+    {
+      "title": "Erros Totais (5xx)",
+      "type": "stat",
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 1 },
+      "targets": [{ "expr": "sum(rate(http_requests_received_total{code=~\"5..\"}[1m]))", "legendFormat": "Erros" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.1 }] } } }
+    },
+    {
+      "title": "INFRAESTRUTURA DO CONTAINER (MÉTODO USE)",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 8 },
+      "collapsed": false
+    },
+    {
+      "title": "Uso de CPU (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 9 },
+      "targets": [{ "expr": "sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=\"app-container\"}[1m])) * 100", "legendFormat": "Uso de CPU" }]
+    },
+    {
+      "title": "Uso de Memória (MB)",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 9 },
+      "targets": [{ "expr": "container_memory_working_set_bytes{container_label_com_docker_compose_service=\"app-container\"} / 1024 / 1024", "legendFormat": "RAM Utilizada" }]
+    },
+    {
+      "title": "SAÚDE DO RUNTIME (.NET INTERNALS)",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+      "collapsed": false
+    },
+    {
+      "title": "Threads Ativas",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 17 },
+      "targets": [{ "expr": "dotnet_threadpool_thread_count", "legendFormat": "Threads" }]
+    },
+    {
+      "title": "Frequência de Garbage Collection",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 17 },
+      "targets": [{ "expr": "rate(dotnet_gc_collection_count_total[1m])", "legendFormat": "Gen {{generation}}" }]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "title": "Monitoramento Full-Stack - SalesAPI",
+  "uid": "full_obs_sales_api"
+}

@@ -1,0 +1,26 @@
+global:
+  scrape_interval: 5s # Intervalo curto para os alunos verem os dados rápido
+
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093 # Nome do serviço no Docker
+
+rule_files:
+  - "rules.yml" # Onde definimos o que é um "problema"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'telegraf'
+    static_configs:
+      - targets: ['192.168.1.184:9273']
+
+  - job_name: 'sales-api'
+    scrape_interval: 5s # Opcional: define a frequência da coleta
+    static_configs:
+      - targets: ['app-container:8080']
